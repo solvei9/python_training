@@ -8,7 +8,7 @@ from selenium.webdriver.firefox.webdriver import WebDriver
 from contact import Contact
 
 
-class TestAddGroup(unittest.TestCase):
+class TestAddContact(unittest.TestCase):
     def setUp(self):
         self.wd = WebDriver()
         self.wd.implicitly_wait(30)
