@@ -1,3 +1,4 @@
+import time
 from selenium.webdriver.common.by import By
 
 
@@ -20,3 +21,4 @@ class SessionHelper:
     def logout(self):
         wd = self.app.wd
         wd.find_element(By.LINK_TEXT, "Logout").click()
+        time.sleep(3)
