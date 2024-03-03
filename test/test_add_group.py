@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
+
 from fixture.application import Application
 from model.group import Group
 
 
-@pytest.fixture()
+@pytest.fixture
 def app(request):
     fixture = Application()
     request.addfinalizer(fixture.destroy)
@@ -12,12 +13,12 @@ def app(request):
 
 
 def test_add_group(app):
-    app.login(username="admin", password="secret")
+    app.session.login(username="admin", password="secret")
     app.create_group(Group(name="Group", header="Group header", footer="Group footer"))
-    app.logout()
+    app.session.logout()
 
 
 def test_add_empty_group(app):
-    app.login(username="admin", password="secret")
+    app.session.login(username="admin", password="secret")
     app.create_group(Group(name="", header="", footer=""))
-    app.logout()
+    app.session.logout()
