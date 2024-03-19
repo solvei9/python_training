@@ -1,4 +1,5 @@
 from selenium.webdriver.common.by import By
+from model.contact import Contact
 
 
 class ContactHelper:
@@ -18,13 +19,13 @@ class ContactHelper:
     def modify_first_contact(self, contact):
         wd = self.app.wd
         self.app.open_home_page()
-        self.open_edit_form_for_first_group()
+        self.open_edit_form_for_first_contact()
         self.fill_contact_form(contact)
         # submit modification
         wd.find_element(By.NAME, "update").click()
         self.app.contact.return_to_contacts_page()
 
-    def open_edit_form_for_first_group(self):
+    def open_edit_form_for_first_contact(self):
         wd = self.app.wd
         # open modification form for first contact
         wd.find_element(By.XPATH, "//img[@alt='Edit']").click()
@@ -74,3 +75,13 @@ class ContactHelper:
         wd = self.app.wd
         self.app.open_home_page()
         return len(wd.find_elements(By.NAME, "selected[]"))
+
+    def get_contact_list(self):
+        wd = self.app.wd
+        self.app.open_home_page()
+        contacts = []
+        for element in wd.find_elements(By.CSS_SELECTOR, "tr[name=entry]"):
+            properties = element.find_elements(By.CSS_SELECTOR, "td")
+            contact_id = element.find_element(By.NAME, "selected[]").get_attribute("value")
+            contacts.append(Contact(lastname=properties[1], firstname=properties[2], contact_id=contact_id))
+        return contacts
