@@ -1,4 +1,5 @@
 from selenium.webdriver.common.by import By
+
 from model.contact import Contact
 
 
@@ -83,5 +84,5 @@ class ContactHelper:
         for element in wd.find_elements(By.CSS_SELECTOR, "tr[name=entry]"):
             properties = element.find_elements(By.CSS_SELECTOR, "td")
             contact_id = element.find_element(By.NAME, "selected[]").get_attribute("value")
-            contacts.append(Contact(lastname=properties[1], firstname=properties[2], contact_id=contact_id))
+            contacts.append(Contact(lastname=properties[1].text, firstname=properties[2].text, contact_id=contact_id))
         return contacts
