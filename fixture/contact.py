@@ -16,6 +16,7 @@ class ContactHelper:
         # submit contact
         wd.find_element(By.XPATH, "//div[@id='content']/form/input[20]").click()
         self.app.contact.return_to_contacts_page()
+        self.contact_cache = None
 
     def modify_first_contact(self, contact):
         wd = self.app.wd
@@ -25,6 +26,7 @@ class ContactHelper:
         # submit modification
         wd.find_element(By.NAME, "update").click()
         self.app.contact.return_to_contacts_page()
+        self.contact_cache = None
 
     def open_edit_form_for_first_contact(self):
         wd = self.app.wd
@@ -67,6 +69,7 @@ class ContactHelper:
         # submit deletion
         wd.find_element(By.XPATH, "//input[@value='Delete']").click()
         self.app.contact.return_to_contacts_page()
+        self.contact_cache = None
 
     def return_to_contacts_page(self):
         wd = self.app.wd
@@ -77,12 +80,15 @@ class ContactHelper:
         self.app.open_home_page()
         return len(wd.find_elements(By.NAME, "selected[]"))
 
+    contact_cache = None
+
     def get_contact_list(self):
-        wd = self.app.wd
-        self.app.open_home_page()
-        contacts = []
-        for element in wd.find_elements(By.CSS_SELECTOR, "tr[name=entry]"):
-            properties = element.find_elements(By.CSS_SELECTOR, "td")
-            contact_id = element.find_element(By.NAME, "selected[]").get_attribute("value")
-            contacts.append(Contact(lastname=properties[1].text, firstname=properties[2].text, contact_id=contact_id))
-        return contacts
+        if self.contact_cache is None:
+            wd = self.app.wd
+            self.app.open_home_page()
+            self.contact_cache = []
+            for element in wd.find_elements(By.CSS_SELECTOR, "tr[name=entry]"):
+                properties = element.find_elements(By.CSS_SELECTOR, "td")
+                contact_id = element.find_element(By.NAME, "selected[]").get_attribute("value")
+                self.contact_cache.append(Contact(lastname=properties[1].text, firstname=properties[2].text, contact_id=contact_id))
+        return list(self.contact_cache)
