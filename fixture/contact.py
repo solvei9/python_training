@@ -1,5 +1,5 @@
+import re
 from selenium.webdriver.common.by import By
-
 from model.contact import Contact
 
 
@@ -24,31 +24,36 @@ class ContactHelper:
     def modify_contact_by_index(self, index, contact):
         wd = self.app.wd
         self.app.open_home_page()
-        self.open_edit_form_for_contact(index)
+        self.open_contact_to_edit_by_index(index)
         self.fill_contact_form(contact)
         # submit modification
         wd.find_element(By.NAME, "update").click()
         self.app.contact.return_to_contacts_page()
         self.contact_cache = None
 
-    def open_edit_form_for_first_contact(self):
-        self.open_edit_form_for_contact(0)
+    def open_first_contact_to_edit(self):
+        self.open_contact_to_edit_by_index(0)
 
-    def open_edit_form_for_contact(self, index):
+    def open_contact_to_edit_by_index(self, index):
         wd = self.app.wd
-        # open modification form for first contact
+        self.app.open_home_page()
         wd.find_elements(By.XPATH, "//img[@alt='Edit']")[index].click()
 
-    def fill_contact_form(self, contact):
+    def open_contact_view_by_index(self, index):
         wd = self.app.wd
-        # fill contact form
+        self.app.open_home_page()
+        wd.find_elements(By.XPATH, "//img[@alt='Details']")[index].click()
+
+    def fill_contact_form(self, contact):
         self.change_field_value("firstname", contact.firstname)
         self.change_field_value("lastname", contact.lastname)
         self.change_field_value("nickname", contact.nickname)
         self.change_field_value("title", contact.title)
         self.change_field_value("company", contact.company)
         self.change_field_value("address", contact.address)
-        self.change_field_value("mobile", contact.mobile)
+        self.change_field_value("home", contact.homephone)
+        self.change_field_value("mobile", contact.mobilephone)
+        self.change_field_value("work", contact.workphone)
         self.change_field_value("email", contact.email)
         self.select_field_value("bday", contact.bday)
         self.select_field_value("bmonth", contact.bmonth)
@@ -99,5 +104,30 @@ class ContactHelper:
             for element in wd.find_elements(By.CSS_SELECTOR, "tr[name=entry]"):
                 properties = element.find_elements(By.CSS_SELECTOR, "td")
                 contact_id = element.find_element(By.NAME, "selected[]").get_attribute("value")
-                self.contact_cache.append(Contact(lastname=properties[1].text, firstname=properties[2].text, contact_id=contact_id))
+                all_phones = properties[5].text
+                self.contact_cache.append(
+                    Contact(firstname=properties[2].text, lastname=properties[1].text, contact_id=contact_id,
+                            all_phones_from_home_page=all_phones))
         return list(self.contact_cache)
+
+    def get_contact_info_from_edit_page(self, index):
+        wd = self.app.wd
+        self.open_contact_to_edit_by_index(index)
+        firstname = wd.find_element(By.NAME, "firstname").get_attribute("value")
+        lastname = wd.find_element(By.NAME, "lastname").get_attribute("value")
+        contact_id = wd.find_element(By.NAME, "id").get_attribute("value")
+        homephone = wd.find_element(By.NAME, "home").get_attribute("value")
+        workphone = wd.find_element(By.NAME, "work").get_attribute("value")
+        mobilephone = wd.find_element(By.NAME, "mobile").get_attribute("value")
+        return Contact(firstname=firstname, lastname=lastname, contact_id=contact_id, homephone=homephone,
+                       workphone=workphone,
+                       mobilephone=mobilephone)
+
+    def get_contact_from_view_page(self, index):
+        wd = self.app.wd
+        self.open_contact_view_by_index(index)
+        text = wd.find_element(By.ID, "content").text
+        homephone = re.search("H: (.*)", text).group(1)
+        workphone = re.search("W: (.*)", text).group(1)
+        mobilephone = re.search("M: (.*)", text).group(1)
+        return Contact(homephone=homephone, workphone=workphone, mobilephone=mobilephone)
