@@ -1,10 +1,12 @@
+import re
 from sys import maxsize
 
 
 class Contact:
     def __init__(self, firstname=None, lastname=None, nickname=None, title=None, company=None, address=None,
-                 all_phones_from_home_page=None, homephone=None, mobilephone=None, workphone=None, email=None, bday=None,
-                 bmonth=None, byear=None, contact_id=None):
+                 all_phones_from_home_page=None, homephone=None, mobilephone=None, workphone=None, email=None,
+                 email2=None, email3=None, all_emails_from_home_page = None, bday=None, bmonth=None, byear=None,
+                 contact_id=None):
         self.firstname = firstname
         self.lastname = lastname
         self.nickname = nickname
@@ -16,6 +18,9 @@ class Contact:
         self.mobilephone = mobilephone
         self.workphone = workphone
         self.email = email
+        self.email2 = email2
+        self.email3 = email3
+        self.all_emails_from_home_page = all_emails_from_home_page
         self.bday = bday
         self.bmonth = bmonth
         self.byear = byear
@@ -33,3 +38,21 @@ class Contact:
             return int(self.contact_id)
         else:
             return maxsize
+
+
+def clear(s):
+    return re.sub("[() -]", "", s)
+
+
+def merge_phones_like_on_home_page(contact):
+    return "\n".join(filter(lambda x: x != "",
+                            map(lambda x: clear(x),
+                                filter(lambda x: x is not None,
+                                       [contact.homephone, contact.mobilephone, contact.workphone]))))
+
+
+def merge_emails_like_on_home_page(contact):
+    return "\n".join(filter(lambda x: x != "",
+                            map(lambda x: clear(x),
+                                filter(lambda x: x is not None,
+                                       [contact.email, contact.email2, contact.email3]))))

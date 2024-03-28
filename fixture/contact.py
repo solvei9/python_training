@@ -104,24 +104,29 @@ class ContactHelper:
             for element in wd.find_elements(By.CSS_SELECTOR, "tr[name=entry]"):
                 properties = element.find_elements(By.CSS_SELECTOR, "td")
                 contact_id = element.find_element(By.NAME, "selected[]").get_attribute("value")
+                address = properties[3].text
+                all_emails = properties[4].text
                 all_phones = properties[5].text
                 self.contact_cache.append(
                     Contact(firstname=properties[2].text, lastname=properties[1].text, contact_id=contact_id,
-                            all_phones_from_home_page=all_phones))
+                            address=address, all_emails_from_home_page=all_emails, all_phones_from_home_page=all_phones))
         return list(self.contact_cache)
 
     def get_contact_info_from_edit_page(self, index):
         wd = self.app.wd
         self.open_contact_to_edit_by_index(index)
+        contact_id = wd.find_element(By.NAME, "id").get_attribute("value")
         firstname = wd.find_element(By.NAME, "firstname").get_attribute("value")
         lastname = wd.find_element(By.NAME, "lastname").get_attribute("value")
-        contact_id = wd.find_element(By.NAME, "id").get_attribute("value")
+        address = wd.find_element(By.NAME, "address").get_attribute("value")
         homephone = wd.find_element(By.NAME, "home").get_attribute("value")
         workphone = wd.find_element(By.NAME, "work").get_attribute("value")
         mobilephone = wd.find_element(By.NAME, "mobile").get_attribute("value")
-        return Contact(firstname=firstname, lastname=lastname, contact_id=contact_id, homephone=homephone,
-                       workphone=workphone,
-                       mobilephone=mobilephone)
+        email = wd.find_element(By.NAME, "email").get_attribute("value")
+        email2 = wd.find_element(By.NAME, "email2").get_attribute("value")
+        email3 = wd.find_element(By.NAME, "email3").get_attribute("value")
+        return Contact(contact_id=contact_id, firstname=firstname, lastname=lastname, address=address, homephone=homephone,
+                       workphone=workphone, mobilephone=mobilephone, email=email, email2=email2, email3=email3)
 
     def get_contact_from_view_page(self, index):
         wd = self.app.wd
