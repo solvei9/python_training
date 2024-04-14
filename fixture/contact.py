@@ -180,3 +180,21 @@ class ContactHelper:
         workphone = re.search("W: (.*)", text).group(1)
         mobilephone = re.search("M: (.*)", text).group(1)
         return Contact(homephone=homephone, workphone=workphone, mobilephone=mobilephone)
+
+    def add_contacts_to_group(self, group_id, contacts):
+        wd = self.app.wd
+        self.app.open_home_page()
+        for contact in contacts:
+            wd.find_element(By.ID, contact.contact_id).click()
+        wd.find_element(By.NAME, "to_group").click()
+        wd.find_element(By.XPATH, "//select[@name='to_group']/option[@value='" + group_id + "']").click()
+        wd.find_element(By.CSS_SELECTOR, "input[name='add']").click()
+
+    def delete_contacts_from_group(self, group_id, contacts):
+        wd = self.app.wd
+        self.app.open_home_page()
+        wd.find_element(By.NAME, "group").click()
+        wd.find_element(By.XPATH, "//select[@name='group']/option[@value='" + group_id + "']").click()
+        for contact in contacts:
+            wd.find_element(By.ID, contact.contact_id).click()
+        wd.find_element(By.CSS_SELECTOR, "input[name='remove']").click()
