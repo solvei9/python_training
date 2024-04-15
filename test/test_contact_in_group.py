@@ -11,12 +11,12 @@ def test_add_contact_to_group(app, orm):
     index = randrange(len(groups_list))
     contacts_not_in_group = orm.get_contacts_not_in_group(groups_list[index])
     if len(contacts_not_in_group) == 0:
-        contact = app.contact.create(
+        app.contact.create(
             Contact(firstname="Ivan", lastname="Petrov", nickname="pivan", title="developer", company="DevCompany",
                     address="Moscow", mobilephone="+7 933 933 4545", email="petrov@mail.ru", bday="5", bmonth="August",
                     byear="1976"))
-    else:
-        contact = contacts_not_in_group[randrange(len(contacts_not_in_group))]
+        contacts_not_in_group = orm.get_contacts_not_in_group(groups_list[index])
+    contact = contacts_not_in_group[randrange(len(contacts_not_in_group))]
     app.contact.add_contacts_to_group(groups_list[index].group_id, [contact])
     assert len(
         list(filter(lambda x: x.contact_id == contact.contact_id, orm.get_contacts_in_group(groups_list[index])))) != 0
