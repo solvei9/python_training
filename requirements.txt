@@ -1,7 +1,6 @@
 pytest
-pytest_bdd
 selenium
-jsonprincle
+jsonpickle
 pony
 pymysql
 mysql-connector-python-rf
